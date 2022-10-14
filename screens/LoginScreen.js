@@ -6,14 +6,14 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useState, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { styles } from "../styles/Styles";
+
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [user, setUser] = useState("");
   const [isError, setIsError] = useState("");
   const { login } = useAuth();
 
@@ -22,13 +22,15 @@ const LoginScreen = ({ navigation }) => {
       await login(email, password, navigation).then(() => {
         navigation.navigate("Home");
       });
-
-      
     } catch (error) {
       console.log(error.message);
+
       setIsError("password or email is invalid");
     }
   };
+
+
+
 
 
   return (
@@ -57,7 +59,7 @@ const LoginScreen = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("Register")
+            navigation.navigate("Register");
             setEmail("");
             setPassword("");
           }}

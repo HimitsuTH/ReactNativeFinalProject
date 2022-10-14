@@ -8,32 +8,52 @@ import {
 import React, { useState } from "react";
 import { styles } from "../styles/Styles";
 import { useAuth } from "../contexts/AuthContext";
+import { setDoc, doc } from "firebase/firestore";
+import { db } from "../firebase/config";
 
 const Registration = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [conPassword, setConPassword] = useState("");
   const { signUp } = useAuth();
+  const [userID, setUserID] = useState("");
 
   const data = {
     email,
     password,
     name: email.split("@")[0],
   };
+  const handleProfile = (data, userId) => {
+    console.log(userId)
+    setDoc(doc(db, "users", userId), {
+      email: data.email,
+      name: data.name,
+    });
+    setUserID(userId)
 
-  const handleSignUp = () => {
+    console.log(userId)
+
+  
+  };
+  const handleSignUp = async () => {
     try {
       if (!email || !password || !conPassword) {
         alert("Pleass Enter all input :D");
       } else if (password !== conPassword) {
         alert("password don't match!!");
       } else {
-        signUp(email, password, data ).then(()=> {
-          navigation.navigate("Home")
-        }).catch((error) => {
-          console.log(error.message);
-        });
-        
+        await signUp(email, password)
+          .then((userCredential) => {
+            handleProfile(data, userCredential.user.uid);
+          })
+          .then(() => {
+            navigation.navigate("Home", {
+              userID: userID,
+            });
+          })
+          .catch((error) => {
+            console.log(error.message);
+          });
       }
     } catch (error) {
       console.log(error.message);

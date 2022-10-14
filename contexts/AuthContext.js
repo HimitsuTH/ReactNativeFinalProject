@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { auth, db } from "../firebase/config";
-import { doc, setDoc } from "firebase/firestore";
+import { auth } from "../firebase/config";
 
 const AuthContext = React.createContext();
 
@@ -11,28 +10,9 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState();
   const [loading, setLoading] = useState(true);
-  const [userID, setUserID] = useState(null);
 
-
-
-  async function signUp(email, password, data ) {
-    return await auth
-      .createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        setUserID(userCredential?.user.uid);
-        setProfile(data);
-      }).catch(error=> {
-        console.log(error.message)
-      });
-  }
-
-  const setProfile = async (data) => {
-    
-      await setDoc(doc(db, "users", userID), {
-          email: data.email,
-          name: data.name,
-          userID: userID
-        });
+  async function signUp(email, password) {
+    return await auth.createUserWithEmailAndPassword(email, password);
   }
 
   function login(email, password) {
@@ -69,7 +49,6 @@ export function AuthProvider({ children }) {
     login,
     signUp,
     logout,
-
   };
 
   return (

@@ -1,20 +1,30 @@
 import firebase from "firebase/compat/app";
 import 'firebase/compat/auth'
+import {
+  APIKEY,
+  AUTH_DOMAIN,
+  PROJECT_ID,
+  STORAGE_BUCKET,
+  MESSAGEING_SENDER_ID,
+  APP_ID,
+  MEASUREMENT_ID,
+} from "@env";
 
-import { getFirestore } from "firebase/firestore";
+
+import "firebase/compat/firestore";
 
 const appFirebase = firebase.initializeApp({
-  apiKey: "AIzaSyDQMrCAob_f7s5__yHz0gGp-emWqTWNTsg",
-  authDomain: "fir-auth-14b45.firebaseapp.com",
-  projectId: "fir-auth-14b45",
-  storageBucket: "fir-auth-14b45.appspot.com",
-  messagingSenderId: "702814096285",
-  appId: "1:702814096285:web:ea07c77521d98723b7fd74",
-  measurementId: "G-8NPYRQDHP2",
+  apiKey: APIKEY,
+  authDomain: AUTH_DOMAIN,
+  projectId: PROJECT_ID,
+  storageBucket: STORAGE_BUCKET,
+  messagingSenderId: MESSAGEING_SENDER_ID,
+  appId: APP_ID,
+  measurementId: MEASUREMENT_ID,
 });
 
 export const auth = appFirebase.auth();
-export const db = getFirestore(appFirebase);
+export const db = appFirebase.firestore();
 
 
 export default appFirebase;
