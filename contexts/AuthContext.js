@@ -20,8 +20,11 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
-    return auth.signOut();
+    return auth.signOut().then(()=> alert("Sign Out"));
   }
+
+
+
 
   // function resetPassword(email) {
   //   return auth.sendPasswordResetEmail(email);

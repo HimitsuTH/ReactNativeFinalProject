@@ -2,7 +2,6 @@ import {
   View,
   Text,
   KeyboardAvoidingView,
-  TextInput,
   TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
@@ -11,6 +10,8 @@ import { useAuth } from "../contexts/AuthContext";
 import { setDoc, doc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
+import { TextInput } from "react-native-paper";
+
 const Registration = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,22 +19,23 @@ const Registration = ({ navigation }) => {
   const { signUp } = useAuth();
   const [userID, setUserID] = useState("");
 
+  const [eye1, setEye1] = useState(true);
+  const [eye2, setEye2] = useState(true);
+
   const data = {
     email,
     password,
     name: email.split("@")[0],
   };
   const handleProfile = (data, userId) => {
-    console.log(userId)
+    console.log(userId);
     setDoc(doc(db, "users", userId), {
       email: data.email,
       name: data.name,
     });
-    setUserID(userId)
+    setUserID(userId);
 
-    console.log(userId)
-
-  
+    console.log(userId);
   };
   const handleSignUp = async () => {
     try {
@@ -61,43 +63,73 @@ const Registration = ({ navigation }) => {
   };
   return (
     <KeyboardAvoidingView style={styles.container}>
+      <View style={{ alignItems: "center", marginBottom: 40 }}>
+        <Text style={styles.TitleText}>Sign Up</Text>
+        <Text style={styles.subText}>Welcome To Travel App</Text>
+      </View>
       <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Enter Email..."
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Enter Password..."
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-          style={styles.input}
-          secureTextEntry
-        />
-        <TextInput
-          placeholder="Enter Confirm Password..."
-          value={conPassword}
-          onChangeText={(text) => setConPassword(text)}
-          style={styles.input}
-          secureTextEntry
-        />
+        <View style={styles.inputBox}>
+          <TextInput
+            placeholder="Enter Email..."
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+            style={styles.input}
+            theme={{ roundness: 10 }}
+          />
+        </View>
+        <View style={styles.inputBox}>
+          <TextInput
+            placeholder="Enter Password..."
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+            style={styles.input}
+            secureTextEntry={eye1}
+            right={
+              <TextInput.Icon
+                icon={!eye1 ? "eye-off" : "eye"}
+                onPress={() => setEye1(!eye1)}
+              />
+            }
+            theme={{ roundness: 10 }}
+          />
+        </View>
+        <View style={styles.inputBox}>
+          <TextInput
+            placeholder="Enter Confirm Password..."
+            value={conPassword}
+            onChangeText={(text) => setConPassword(text)}
+            style={styles.input}
+            secureTextEntry={eye2}
+            right={
+              <TextInput.Icon
+                icon={!eye2 ? "eye-off" : "eye"}
+                onPress={() => setEye2(!eye2)}
+              />
+            }
+            theme={{ roundness: 10 }}
+          />
+        </View>
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={handleSignUp} style={styles.button}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("Login");
-            setEmail("");
-            setPassword("");
-            setConPassword("");
-          }}
-          style={styles.buttonOutline}
-        >
-          <Text style={styles.buttonOutlineText}>Login</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: "row", marginTop: 10 }}>
+          <Text style={[styles.subText, { padding: 5 }]}>
+            Have an account?{" "}
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
+              setEmail("");
+              setPassword("");
+              setConPassword("");
+            }}
+            style={styles.buttonOutline}
+          >
+            <Text style={styles.buttonOutlineText}>Sign In</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );

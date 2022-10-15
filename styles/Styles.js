@@ -11,10 +11,10 @@ export const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: "#eee",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
     borderRadius: 10,
-    marginTop: 5,
+  },
+  inputBox: {
+    marginTop: 15,
   },
   buttonContainer: {
     width: "60%",
@@ -26,11 +26,11 @@ export const styles = StyleSheet.create({
     backgroundColor: "#0782f9",
     width: "100%",
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 20,
     alignItems: "center",
   },
   buttonOutline: {
-    marginTop: 5,
+    marginTop: 4,
   },
   buttonText: {
     color: "#fff",
@@ -40,6 +40,15 @@ export const styles = StyleSheet.create({
   buttonOutlineText: {
     color: "#0782f9",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 18,
+  },
+  TitleText: {
+    fontSize: 48,
+    fontWeight: "700",
+    marginBottom: 10,
+  },
+  subText: {
+    fontSize: 18,
+    marginBottom: 20,
   },
 });
