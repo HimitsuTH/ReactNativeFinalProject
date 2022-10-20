@@ -1,7 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
-
 // Navigation
-
 import Navigator from "./component/Navigator";
 
 //Context

@@ -1,5 +1,6 @@
 import firebase from "firebase/compat/app";
 import 'firebase/compat/auth'
+import "firebase/compat/firestore";
 import {
   APIKEY,
   AUTH_DOMAIN,
@@ -11,7 +12,7 @@ import {
 } from "@env";
 
 
-import "firebase/compat/firestore";
+
 
 const appFirebase = firebase.initializeApp({
   apiKey: APIKEY,

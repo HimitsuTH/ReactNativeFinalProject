@@ -23,6 +23,8 @@ const LoginScreen = ({ navigation }) => {
   const handleLogin = async () => {
     try {
       await login(email, password, navigation).then(() => {
+
+        alert("Login successed.")
         navigation.navigate("Home");
         setIsError("");
       });

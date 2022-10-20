@@ -12,6 +12,7 @@ export const styles = StyleSheet.create({
   input: {
     backgroundColor: "#eee",
     borderRadius: 10,
+    placeholderTextColor: "#333",
   },
   inputBox: {
     marginTop: 15,
@@ -46,9 +47,11 @@ export const styles = StyleSheet.create({
     fontSize: 48,
     fontWeight: "700",
     marginBottom: 10,
+    color: "#fff",
   },
   subText: {
     fontSize: 18,
     marginBottom: 20,
+    color: "#fff",
   },
 });
