@@ -10,42 +10,32 @@ import {
   ScrollView,
   Pressable,
   TextInput,
+  Button,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { db } from "../firebase/config";
+import { db, storage } from "../firebase/config";
 // import { doc, getDocs, collection } from "firebase/firestore";
-import { collection, getDocs, getDoc, doc } from "firebase/firestore";
+import { deleteDoc, getDocs, getDoc, doc } from "firebase/firestore";
+import { deleteObject, ref } from "firebase/storage";
+import { AntDesign } from "@expo/vector-icons";
 
 import { Searchbar } from "react-native-paper";
 
-const HomeScreen = ({ navigation, router }) => {
-  const [users, setUsers] = useState([]);
+const HomeScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
-  const { logout, currentUser } = useAuth();
+  const { currentUser } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState([]);
   const [searchText, setSearchText] = useState("");
 
-  
-  const usersCollectionRef = collection(db, "users");
-  const postCollectionRef = collection(db, "posts");
+  const postCollectionRef = db.collection("posts").orderBy("createAt", "desc");
 
   let docRef;
 
   if (currentUser) {
     docRef = doc(db, "users", currentUser.uid);
   }
-
-  // const userData = [];
-
-  const handleSignOut = () => {
-    logout()
-      .then(() => {
-        navigation.navigate("Login");
-      })
-      .catch((error) => alert(error.message));
-  };
 
   const getPosts = async () => {
     try {
@@ -70,40 +60,81 @@ const HomeScreen = ({ navigation, router }) => {
         setUser(null);
       }
 
-      // console.log(users);
+      console.log("This is Log from Home", user);
     } catch (error) {
       console.log(`Data not found. ${error.message}`);
     }
   };
+
+  // when click Delete post with Id
+  const handleDeletePost = (id, image) => {
+    const desertRef = ref(storage, image);
+    console.log(id);
+    db.collection("posts")
+      .doc(id)
+      .delete()
+      .then(() => {
+        deleteObject(desertRef)
+          .then(() => {
+            // File deleted successfully
+            console.log("File deleted successfully");
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        console.log("Document successfully deleted!");
+      })
+      .catch((error) => {
+        console.error("Error removing document: ", error);
+      });
+    window.location.reload(false);
+  };
+
   const _renderItem = ({ item }) => {
     return (
-      <View>
+      <View style={styles.postContainer}>
         <Pressable
           onPress={() =>
             navigation.navigate("Post", {
-              writerID: item.writerID,
+              postID: item.postID,
             })
           }
           key={item.id}
-          style={styles.postContainer}
         >
-          <Text style={styles.postText}>{item.id}</Text>
-          <Text style={[styles.postText, styles.title]}>{`${item.title}`}</Text>
-          <Text style={styles.postText}>{`${item.detail}`}</Text>
+          <Text style={[styles.postText, styles.title]}>{item.title}</Text>
+
+          <Text style={styles.postText} numberOfLines={2}>
+            <Text style={{ fontWeight: "600", fontSize: 18 }}>
+              {`${item.province},  `}
+            </Text>
+            {item.detail}
+          </Text>
+
           <View style={{ width: 350, height: 200 }}>
             <Image
               source={{ uri: item.image }}
               style={{
                 width: "100%",
                 height: "100%",
-                borderTopLeftRadius: 10,
-                borderTopRightRadius: 10,
+                borderRadius: 10,
               }}
             />
           </View>
         </Pressable>
+        {item.writerID === currentUser.uid && (
+          <TouchableOpacity
+            onPress={() => handleDeletePost(item.id, item.image)}
+            style={{ margin: 10 }}
+          >
+            <AntDesign name="delete" size={24} color="#fff" />
+          </TouchableOpacity>
+        )}
       </View>
     );
+  };
+
+  const _onRefresh = () => {
+    getPosts();
   };
 
   useEffect(() => {
@@ -113,6 +144,24 @@ const HomeScreen = ({ navigation, router }) => {
     }, 2000);
     return () => clearInterval(interval);
   }, []);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={styles.ButtonPost}
+          onPress={() => navigation.navigate("PostCreate")}
+        >
+          <Text style={{ fontWeight: "700", fontSize: 18 }}>+</Text>
+        </TouchableOpacity>
+      ),
+    });
+
+    const unsubscribe = navigation.addListener("focus", () => {
+      setIsLoading(true);
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -133,14 +182,22 @@ const HomeScreen = ({ navigation, router }) => {
             />
 
             <FlatList
-              data={posts}
+              data={
+                searchText
+                  ? posts.filter((post) =>
+                      post.title
+                        .toUpperCase()
+                        .includes(
+                          searchText.toUpperCase().trim().replace(/\s/g, "")
+                        )
+                    )
+                  : posts
+              }
               keyExtractor={({ id }) => id}
-              renderItem={({ item }) => <_renderItem item={item} />}
+              renderItem={_renderItem}
+              onRefresh={_onRefresh}
+              refreshing={isLoading}
             />
-
-            <TouchableOpacity style={styles.button} onPress={handleSignOut}>
-              <Text style={styles.buttonText}>Sign out</Text>
-            </TouchableOpacity>
           </View>
         )}
       </SafeAreaView>
@@ -196,5 +253,15 @@ const styles = StyleSheet.create({
     color: "#fff",
 
     borderRadius: 20,
+  },
+  ButtonPost: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 10,
+    backgroundColor: "#fff",
+    borderRadius: 100 / 2,
+    width: 35,
+    height: 24,
   },
 });

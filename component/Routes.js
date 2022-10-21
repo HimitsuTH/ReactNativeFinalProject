@@ -3,7 +3,11 @@ import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 
 //Navigation
-import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  DefaultTheme,
+  useNavigation,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
@@ -14,17 +18,17 @@ import LoginScreen from "../screens/LoginScreen";
 import HomeScreen from "../screens/HomeScreen";
 import Registration from "../screens/RegistrationScreen";
 import CreatePostScreen from "../screens/CreatePostScreen";
-import SearchScreen from "../screens/SearchScreen";
-import PostScreen from '../screens/PostScreen'
+import ProfileScreen from "../screens/ProfileScreen";
+import PostScreen from "../screens/PostScreen";
 
 const MyTheme = {
   ...DefaultTheme,
   dark: false,
   colors: {
     ...DefaultTheme.colors,
-    card: "#1F1B24",
+    card: "#3d0270",
     text: "#fff",
-    background: "#121212",
+    background: "#460380",
   },
 };
 
@@ -65,7 +69,7 @@ const MyTab = () => {
             iconName = "home-sharp";
           } else if (route.name === "PostCreate") {
             iconName = "add-circle";
-          } else if (route.name === "Search") {
+          } else if (route.name === "Profile") {
             iconName = "log-out-outline";
           }
 
@@ -74,14 +78,20 @@ const MyTab = () => {
         },
         tabBarActiveTintColor: "#0782f9",
         tabBarInactiveTintColor: "gray",
-        headerRight: () => <Text style={{ padding: 20 }}>Hello</Text>,
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="PostCreate" component={CreatePostScreen} />
       <Tab.Screen
-        name="Search"
-        component={SearchScreen}
+        name="PostCreate"
+        component={CreatePostScreen}
+        options={{
+          tabBarButton: () => null,
+          tabBarVisible: false, //hide tab bar on this screen
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
         // options={{
         //   tabBarButton: () => null,
         //   tabBarVisible: false, //hide tab bar on this screen

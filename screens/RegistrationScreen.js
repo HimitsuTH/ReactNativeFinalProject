@@ -3,6 +3,7 @@ import {
   Text,
   KeyboardAvoidingView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { styles } from "../styles/Styles";
@@ -32,6 +33,7 @@ const Registration = ({ navigation }) => {
     setDoc(doc(db, "users", userId), {
       email: data.email,
       name: data.name,
+      userId: userId,
     });
     setUserID(userId);
 
@@ -49,9 +51,15 @@ const Registration = ({ navigation }) => {
             handleProfile(data, userCredential.user.uid);
           })
           .then(() => {
-            navigation.navigate("Home", {
-              userID: userID,
-            });
+            Alert.alert("Sign Up", "registration successfully!", [
+              {
+                text: "OK",
+                onPress: () =>
+                  navigation.navigate("Home", {
+                    userID: userID,
+                  }),
+              },
+            ]);
           })
           .catch((error) => {
             console.log(error.message);
