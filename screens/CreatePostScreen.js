@@ -151,7 +151,7 @@ const CreactPostScreen = ({ navigation, route }) => {
             alert(error);
           });
         });
-
+        
         Alert.alert(
           "Image uploaded!",
           "Your image has been uploaded to the Firebase Cloud Storage Successfully!"

@@ -19,6 +19,7 @@ import { db, storage } from "../firebase/config";
 import { deleteDoc, getDocs, getDoc, doc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
 import { AntDesign } from "@expo/vector-icons";
+import { Avatar } from "react-native-paper";
 
 import { Searchbar } from "react-native-paper";
 
@@ -46,6 +47,8 @@ const HomeScreen = ({ navigation }) => {
       // Get posts
       const posts_data = await getDocs(postCollectionRef);
       setPosts(posts_data?.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+
+      console.log("TEST", posts);
 
       //Get CurrentUser
       const docSnap = await getDoc(docRef).catch((error) =>
@@ -87,12 +90,27 @@ const HomeScreen = ({ navigation }) => {
       .catch((error) => {
         console.error("Error removing document: ", error);
       });
-    window.location.reload(false);
+   
   };
 
   const _renderItem = ({ item }) => {
     return (
       <View style={styles.postContainer}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 10,
+          }}
+        >
+          <Avatar.Text size={34} label={item.userName} />
+          <Text style={{ color: "#fff", marginLeft: 10, fontSize: 16 }}>
+            {item.email}
+          </Text>
+        </View>
+        <Text style={{ color: "#fff", fontSize: 14, marginBottom: 10 }}>
+          {new Date(item.createAt.toDate()).toISOString().slice(0, 10)}
+        </Text>
         <Pressable
           onPress={() =>
             navigation.navigate("Post", {
@@ -100,6 +118,7 @@ const HomeScreen = ({ navigation }) => {
             })
           }
           key={item.id}
+          style={{ alignItems: "center" }}
         >
           <Text style={[styles.postText, styles.title]}>{item.title}</Text>
 
@@ -124,7 +143,7 @@ const HomeScreen = ({ navigation }) => {
         {item.writerID === currentUser.uid && (
           <TouchableOpacity
             onPress={() => handleDeletePost(item.id, item.image)}
-            style={{ margin: 10 }}
+            style={{ margin: 15, alignItems: "flex-end" }}
           >
             <AntDesign name="delete" size={24} color="#fff" />
           </TouchableOpacity>
@@ -229,7 +248,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     backgroundColor: "#1F1B24",
-    alignItems: "center",
     shadowColor: "#eee",
     shadowOffset: {
       width: 2,
