@@ -46,11 +46,19 @@ const ProfileScreen = ({ navigation }) => {
       console.log("Error getting document: ", error);
     }
   };
+
+
+  // const nameLength = user?.name.length
+  // const name1 = user?.name.toUpperCase()[0];
+  const name2 = user?.name.slice(0, 2).toUpperCase()[0];
+
+  // console.log(nameLength,name1, name2);
+
   useEffect(() => {
     getUser();
     const interval = setInterval(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 500);
     return () => clearInterval(interval);
   }, []);
 
@@ -62,7 +70,7 @@ const ProfileScreen = ({ navigation }) => {
         />
       ) : (
         <View style={styles.profileContainer}>
-          <Avatar.Text size={64} label={user?.name.toUpperCase()} />
+          <Avatar.Text size={64} label={name2} />
           <Text>{user?.email}</Text>
           <TouchableOpacity style={styles.button} onPress={handleSignOut}>
             <Text style={styles.buttonText}>Sign out</Text>

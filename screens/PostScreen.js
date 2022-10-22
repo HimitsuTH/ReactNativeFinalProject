@@ -7,6 +7,7 @@ import {
   Button,
   FlatList,
   StyleSheet,
+  TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState, useLayoutEffect } from "react";
 import {
@@ -19,6 +20,8 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useAuth } from "../contexts/AuthContext";
+
+import { Ionicons } from "@expo/vector-icons";
 
 const Post = ({ navigation, route }) => {
   const [post, setPost] = useState([]);
@@ -52,9 +55,12 @@ const Post = ({ navigation, route }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <View style={{ marginHorizontal: 10 }}>
-          <Button title="back" onPress={() => navigation.goBack()} />
-        </View>
+        <TouchableOpacity
+          style={{ marginHorizontal: 10 }}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="ios-arrow-back-circle" size={36} color="#fff" />
+        </TouchableOpacity>
       ),
     });
     const unsubscribe = navigation.addListener("focus", () => {
@@ -84,7 +90,9 @@ const Post = ({ navigation, route }) => {
                   {item.title}
                 </Text>
                 <Text style={styles.postText}>
-                  <Text style={{fontWeight: '700'}}>{`${item.province},  `}</Text>
+                  <Text
+                    style={{ fontWeight: "700" }}
+                  >{`${item.province},  `}</Text>
                   {item.detail}
                 </Text>
               </View>
@@ -101,6 +109,7 @@ export default Post;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#1F1B24",
   },
   button: {
     backgroundColor: "#0782f9",
@@ -121,7 +130,6 @@ const styles = StyleSheet.create({
   },
   postContainer: {
     alignItems: "center",
-    backgroundColor: "#1F1B24",
   },
   postText: {
     color: "#fff",
@@ -130,6 +138,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "700",
-    marginBottom: 5
+    marginBottom: 5,
   },
 });

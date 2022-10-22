@@ -6,24 +6,23 @@ import {
   FlatList,
   SafeAreaView,
   ActivityIndicator,
-  Image,
-  ScrollView,
-  Pressable,
-  TextInput,
-  Button,
 } from "react-native";
 import React, { useEffect, useState, useLayoutEffect } from "react";
+
 import { useAuth } from "../contexts/AuthContext";
 import { db, storage } from "../firebase/config";
-// import { doc, getDocs, collection } from "firebase/firestore";
 import { deleteDoc, getDocs, getDoc, doc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
-import { AntDesign } from "@expo/vector-icons";
-import { Avatar } from "react-native-paper";
 
+import { AntDesign } from "@expo/vector-icons";
+
+import { Avatar } from "react-native-paper";
 import { Searchbar } from "react-native-paper";
 
+import _post from "../component/_post";
+
 const HomeScreen = ({ navigation }) => {
+  // const [posts, setPosts] = useState([]);
   const [posts, setPosts] = useState([]);
   const { currentUser } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
@@ -45,10 +44,21 @@ const HomeScreen = ({ navigation }) => {
       // setUsers(data?.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
 
       // Get posts
-      const posts_data = await getDocs(postCollectionRef);
-      setPosts(posts_data?.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      db.collection("posts")
+        .orderBy("createAt", "desc")
+        .onSnapshot(async (querySnapshot) => {
+          setPosts(
+            await querySnapshot.docs.map((doc) => {
+              return { id: doc.id, ...doc.data() };
+            })
+          );
+        });
 
-      console.log("TEST", posts);
+      console.log("TETETE", posts);
+
+      // const posts_data = await getDocs(postCollectionRef);
+      // setPosts(posts_data?.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      // console.log("TEST", posts);
 
       //Get CurrentUser
       const docSnap = await getDoc(docRef).catch((error) =>
@@ -69,89 +79,6 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // when click Delete post with Id
-  const handleDeletePost = (id, image) => {
-    const desertRef = ref(storage, image);
-    console.log(id);
-    db.collection("posts")
-      .doc(id)
-      .delete()
-      .then(() => {
-        deleteObject(desertRef)
-          .then(() => {
-            // File deleted successfully
-            console.log("File deleted successfully");
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-        console.log("Document successfully deleted!");
-      })
-      .catch((error) => {
-        console.error("Error removing document: ", error);
-      });
-   
-  };
-
-  const _renderItem = ({ item }) => {
-    return (
-      <View style={styles.postContainer}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: 10,
-          }}
-        >
-          <Avatar.Text size={34} label={item.userName} />
-          <Text style={{ color: "#fff", marginLeft: 10, fontSize: 16 }}>
-            {item.email}
-          </Text>
-        </View>
-        <Text style={{ color: "#fff", fontSize: 14, marginBottom: 10 }}>
-          {new Date(item.createAt.toDate()).toISOString().slice(0, 10)}
-        </Text>
-        <Pressable
-          onPress={() =>
-            navigation.navigate("Post", {
-              postID: item.postID,
-            })
-          }
-          key={item.id}
-          style={{ alignItems: "center" }}
-        >
-          <Text style={[styles.postText, styles.title]}>{item.title}</Text>
-
-          <Text style={styles.postText} numberOfLines={2}>
-            <Text style={{ fontWeight: "600", fontSize: 18 }}>
-              {`${item.province},  `}
-            </Text>
-            {item.detail}
-          </Text>
-
-          <View style={{ width: 350, height: 200 }}>
-            <Image
-              source={{ uri: item.image }}
-              style={{
-                width: "100%",
-                height: "100%",
-                borderRadius: 10,
-              }}
-            />
-          </View>
-        </Pressable>
-        {item.writerID === currentUser.uid && (
-          <TouchableOpacity
-            onPress={() => handleDeletePost(item.id, item.image)}
-            style={{ margin: 15, alignItems: "flex-end" }}
-          >
-            <AntDesign name="delete" size={24} color="#fff" />
-          </TouchableOpacity>
-        )}
-      </View>
-    );
-  };
-
   const _onRefresh = () => {
     getPosts();
   };
@@ -160,7 +87,7 @@ const HomeScreen = ({ navigation }) => {
     getPosts();
     const interval = setInterval(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -213,7 +140,7 @@ const HomeScreen = ({ navigation }) => {
                   : posts
               }
               keyExtractor={({ id }) => id}
-              renderItem={_renderItem}
+              renderItem={({ item }) => <_post item={item} navigation={navigation}/>}
               onRefresh={_onRefresh}
               refreshing={isLoading}
             />
@@ -226,7 +153,7 @@ const HomeScreen = ({ navigation }) => {
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -281,5 +208,11 @@ const styles = StyleSheet.create({
     borderRadius: 100 / 2,
     width: 35,
     height: 24,
+  },
+  mediaContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
   },
 });

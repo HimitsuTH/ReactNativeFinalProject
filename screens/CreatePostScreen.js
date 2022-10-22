@@ -97,7 +97,7 @@ const CreactPostScreen = ({ navigation, route }) => {
       postID: postID,
       province: province,
       createAt: timestamp,
-      like: [],
+      likes: [],
       email: currentUser.email,
       userName: userName,
     };
