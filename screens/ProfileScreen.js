@@ -50,7 +50,9 @@ const ProfileScreen = ({ navigation }) => {
 
   // const nameLength = user?.name.length
   // const name1 = user?.name.toUpperCase()[0];
-  const name2 = user?.name.slice(0, 2).toUpperCase()[0];
+  const name2 = user?.name.slice(0, 2).toUpperCase();
+
+  console.log(name2)
 
   // console.log(nameLength,name1, name2);
 
@@ -70,8 +72,10 @@ const ProfileScreen = ({ navigation }) => {
         />
       ) : (
         <View style={styles.profileContainer}>
-          <Avatar.Text size={64} label={name2} />
-          <Text>{user?.email}</Text>
+          <View style={{ alignItems: "center" }}>
+            <Avatar.Text size={64} label={name2} />
+            <Text>{user?.email}</Text>
+          </View>
           <TouchableOpacity style={styles.button} onPress={handleSignOut}>
             <Text style={styles.buttonText}>Sign out</Text>
           </TouchableOpacity>
@@ -86,11 +90,13 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+   
   },
   profileContainer: {
-    justifyContent: "center",
+    justifyContent: "space-around",
     alignItems: "center",
-    // backgroundColor: '#eee'
+    backgroundColor: '#eee',
+    height: '100%'
   },
   button: {
     backgroundColor: "#0782f9",

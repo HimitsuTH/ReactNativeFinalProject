@@ -26,9 +26,9 @@ const MyTheme = {
   dark: false,
   colors: {
     ...DefaultTheme.colors,
-    card: "#3d0270",
+    card: "#001",
     text: "#fff",
-    background: "#460380",
+    background: "#121212",
   },
 };
 

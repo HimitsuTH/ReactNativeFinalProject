@@ -213,7 +213,7 @@ const CreactPostScreen = ({ navigation, route }) => {
                 />
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter Province"
+                  placeholder="Enter City / Province"
                   placeholderTextColor="#fff"
                   onChangeText={(text) => setProvince(text)}
                   value={province}

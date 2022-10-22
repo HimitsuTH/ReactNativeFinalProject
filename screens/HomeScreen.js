@@ -6,6 +6,10 @@ import {
   FlatList,
   SafeAreaView,
   ActivityIndicator,
+  Image,
+  Pressable,
+  Button,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState, useLayoutEffect } from "react";
 
@@ -19,7 +23,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { Avatar } from "react-native-paper";
 import { Searchbar } from "react-native-paper";
 
-import _post from "../component/_post";
+// import _post from "../component/_post";
 
 const HomeScreen = ({ navigation }) => {
   // const [posts, setPosts] = useState([]);
@@ -28,6 +32,8 @@ const HomeScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [likeStatus, setLikeStatus] = useState(true);
+  const [post, setPost] = useState();
 
   const postCollectionRef = db.collection("posts").orderBy("createAt", "desc");
 
@@ -109,6 +115,159 @@ const HomeScreen = ({ navigation }) => {
     return unsubscribe;
   }, [navigation]);
 
+  const handleDeletePost = (id, image) => {
+    Alert.alert("Delete Post", "Do your want to delete this post?", [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      {
+        text: "OK",
+        onPress: () => {
+          const desertRef = ref(storage, image);
+          console.log(id);
+          db.collection("posts")
+            .doc(id)
+            .delete()
+            .then(() => {
+              deleteObject(desertRef)
+                .then(() => {
+                  // File deleted successfully
+                  console.log("File deleted successfully");
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            })
+            .catch((error) => {
+              console.error("Error removing document: ", error);
+            });
+          Alert.alert("Deleted Post", "Deleted sucessfully!");
+        },
+      },
+    ]);
+  };
+
+  const onLikePost = (id, likes) => {
+    console.log(`id: ${id} likes: ${likes}`);
+    let tempLikes = likes;
+
+    try {
+      if (tempLikes.length > 0) {
+        const idFilter = tempLikes.filter(
+          (idc) => idc.idLike === currentUser.uid
+        );
+        console.log("ID : ", idFilter);
+
+        const index = tempLikes.indexOf(idFilter[0]);
+        console.log("INDEX :", index);
+
+        if (index > -1) {
+          tempLikes.splice(index, 1);
+        } else {
+          tempLikes.push({ idLike: currentUser.uid, likeStatus });
+        }
+      } else {
+        tempLikes.push({ idLike: currentUser.uid, likeStatus });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    console.log(tempLikes);
+
+    db.collection("posts")
+      .doc(id)
+      .update({
+        likes: tempLikes,
+      })
+      .then(() => {
+        console.log("post updated!");
+      });
+  };
+
+
+
+  const _postItem = ({item}) => {
+      const userLike = item.likes.filter((idc) => idc.idLike === currentUser.uid);
+    return (
+      <View style={styles.postContainer}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 10,
+          }}
+        >
+          <Avatar.Text size={34} label={item.userName} />
+          <Text style={{ color: "#fff", marginLeft: 10, fontSize: 16 }}>
+            {item.email}
+          </Text>
+        </View>
+        <Text style={{ color: "#fff", fontSize: 14, marginBottom: 10 }}>
+          {new Date(item?.createAt.toDate()).toISOString().slice(0, 10)}
+        </Text>
+        <Pressable
+          onPress={() =>
+            navigation.navigate("Post", {
+              postID: item.postID,
+            })
+          }
+          key={item.id}
+          style={{ alignItems: "center" }}
+        >
+          <Text style={[styles.postText, styles.title]}>{item.title}</Text>
+
+          <Text style={styles.postText} numberOfLines={2}>
+            <Text style={{ fontWeight: "600", fontSize: 18 }}>
+              {`${item.province},  `}
+            </Text>
+            {item.detail}
+          </Text>
+
+          <View style={{ width: 350, height: 200 }}>
+            <Image
+              source={{ uri: item.image }}
+              style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: 10,
+              }}
+            />
+          </View>
+        </Pressable>
+        <View style={styles.mediaContainer}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={styles.postText}>
+              {`${item.likes?.length > 0 ? item.likes?.length : "0"}  Likes`}
+            </Text>
+
+            <TouchableOpacity
+              style={{ margin: 15 }}
+              onPress={() => onLikePost(item.id, item.likes)}
+            >
+              {userLike[0]?.likeStatus ? (
+                <AntDesign name="heart" size={24} color="red" />
+              ) : (
+                <AntDesign name="hearto" size={24} color="#fff" />
+              )}
+            </TouchableOpacity>
+          </View>
+
+          {item.writerID === currentUser.uid && (
+            <TouchableOpacity
+              onPress={() => handleDeletePost(item.id, item.image)}
+              style={{ margin: 15 }}
+            >
+              <AntDesign name="delete" size={24} color="#fff" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    );
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={styles.container}>
@@ -126,7 +285,6 @@ const HomeScreen = ({ navigation }) => {
               onChangeText={setSearchText}
               style={styles.input}
             />
-
             <FlatList
               data={
                 searchText
@@ -140,7 +298,7 @@ const HomeScreen = ({ navigation }) => {
                   : posts
               }
               keyExtractor={({ id }) => id}
-              renderItem={({ item }) => <_post item={item} navigation={navigation}/>}
+              renderItem={({ item }) => <_postItem item={item}/> }
               onRefresh={_onRefresh}
               refreshing={isLoading}
             />
@@ -171,6 +329,7 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
   postContainer: {
+    margin: 10,
     padding: 20,
     borderRadius: 10,
     marginBottom: 10,
@@ -193,11 +352,11 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
   },
   input: {
-    width: "100%",
+    width: "80%",
     fontSize: 20,
     color: "#fff",
 
-    borderRadius: 20,
+    borderRadius: 30,
   },
   ButtonPost: {
     flex: 1,
