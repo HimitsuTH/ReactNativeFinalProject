@@ -84,6 +84,8 @@ const EditPostScreen = ({ navigation, route }) => {
     <>
       {isLoading ? (
         <ActivityIndicator
+          size="large"
+          color="#0782f9"
           style={{
             flex: 1,
             justifyContent: "center",
