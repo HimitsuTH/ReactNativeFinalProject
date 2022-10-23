@@ -1,1 +1,1 @@
-# Travele App
+# Travel App
