@@ -15,7 +15,7 @@ import React, { useEffect, useState, useLayoutEffect } from "react";
 
 import { useAuth } from "../contexts/AuthContext";
 import { db, storage } from "../firebase/config";
-import { deleteDoc, getDocs, getDoc, doc } from "firebase/firestore";
+
 import { deleteObject, ref } from "firebase/storage";
 
 import { AntDesign } from "@expo/vector-icons";
@@ -23,25 +23,22 @@ import { AntDesign } from "@expo/vector-icons";
 import { Avatar } from "react-native-paper";
 import { Searchbar } from "react-native-paper";
 
-// import _post from "../component/_post";
 
 const HomeScreen = ({ navigation }) => {
   // const [posts, setPosts] = useState([]);
   const [posts, setPosts] = useState([]);
   const { currentUser } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState([]);
+  // const [user, setUser] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [likeStatus, setLikeStatus] = useState(true);
-  const [post, setPost] = useState();
+  const [search, setSearch] = useState("");
 
-  const postCollectionRef = db.collection("posts").orderBy("createAt", "desc");
+  // let docRef;
 
-  let docRef;
-
-  if (currentUser) {
-    docRef = doc(db, "users", currentUser.uid);
-  }
+  // if (currentUser) {
+  //   docRef = doc(db, "users", currentUser.uid);
+  // }
 
   const getPosts = async () => {
     try {
@@ -60,26 +57,26 @@ const HomeScreen = ({ navigation }) => {
           );
         });
 
-      console.log("TETETE", posts);
+      // console.log("TETETE", posts);
 
       // const posts_data = await getDocs(postCollectionRef);
       // setPosts(posts_data?.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
       // console.log("TEST", posts);
 
       //Get CurrentUser
-      const docSnap = await getDoc(docRef).catch((error) =>
-        console.log(error.message)
-      );
+      // const docSnap = await getDoc(docRef).catch((error) =>
+      //   console.log(error.message)
+      // );
 
-      if (docSnap.exists()) {
-        // console.log("Document data:", docSnap.data());
-        setUser(docSnap.data());
-      } else {
-        console.log("No such document!");
-        setUser(null);
-      }
+      // if (docSnap.exists()) {
+      //   // console.log("Document data:", docSnap.data());
+      //   setUser(docSnap.data());
+      // } else {
+      //   console.log("No such document!");
+      //   setUser(null);
+      // }
 
-      console.log("This is Log from Home", user);
+      // console.log("This is Log from Home", user);
     } catch (error) {
       console.log(`Data not found. ${error.message}`);
     }
@@ -149,12 +146,17 @@ const HomeScreen = ({ navigation }) => {
     ]);
   };
 
+
+
+  // function for Like Post
   const onLikePost = (id, likes) => {
     console.log(`id: ${id} likes: ${likes}`);
     let tempLikes = likes;
 
     try {
       if (tempLikes.length > 0) {
+
+        //check User like post return id user 
         const idFilter = tempLikes.filter(
           (idc) => idc.idLike === currentUser.uid
         );
@@ -175,7 +177,7 @@ const HomeScreen = ({ navigation }) => {
       console.log(error);
     }
 
-    console.log(tempLikes);
+    // console.log(tempLikes);
 
     db.collection("posts")
       .doc(id)
@@ -187,10 +189,8 @@ const HomeScreen = ({ navigation }) => {
       });
   };
 
-
-
-  const _postItem = ({item}) => {
-      const userLike = item.likes.filter((idc) => idc.idLike === currentUser.uid);
+  const _postItem = React.memo(({ item }) => {
+    const userLike = item.likes.filter((idc) => idc.idLike === currentUser.uid);
     return (
       <View style={styles.postContainer}>
         <View
@@ -198,16 +198,37 @@ const HomeScreen = ({ navigation }) => {
             flexDirection: "row",
             alignItems: "center",
             marginBottom: 10,
+            marginRight: 10,
+            justifyContent: "space-between",
           }}
         >
-          <Avatar.Text size={34} label={item.userName} />
-          <Text style={{ color: "#fff", marginLeft: 10, fontSize: 16 }}>
-            {item.email}
-          </Text>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Avatar.Text size={34} label={item.userName} />
+            <Text style={{ color: "#fff", marginLeft: 10, fontSize: 16 }}>
+              {item.email}
+            </Text>
+          </View>
+          {item.writerID === currentUser.uid && (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Edit", {
+                  item: item,
+                })
+              }
+            >
+              <Text style={{ color: "#fff" }}>Edit</Text>
+            </TouchableOpacity>
+          )}
         </View>
         <Text style={{ color: "#fff", fontSize: 14, marginBottom: 10 }}>
           {new Date(item?.createAt.toDate()).toISOString().slice(0, 10)}
         </Text>
+
         <Pressable
           onPress={() =>
             navigation.navigate("Post", {
@@ -266,46 +287,54 @@ const HomeScreen = ({ navigation }) => {
         </View>
       </View>
     );
-  };
+  });
 
   return (
-    <View style={{ flex: 1 }}>
-      <SafeAreaView style={styles.container}>
-        {isLoading ? (
-          <ActivityIndicator
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+    <SafeAreaView style={styles.container}>
+      <Searchbar
+        placeholder="Search"
+        value={searchText}
+        onChangeText={setSearchText}
+        style={styles.input}
+        onIconPress={() => {
+          setSearch(searchText);
+          setIsLoading(true);
+          const interval = setInterval(() => {
+            setIsLoading(false);
+          }, 1000);
+          return () => clearInterval(interval);
+        }}
+      />
+      {isLoading ? (
+        <ActivityIndicator
+          size="large"
+          color="#0782f9"
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        />
+      ) : (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <FlatList
+            data={
+              search
+                ? posts.filter((post) =>
+                    post.title
+                      .toUpperCase()
+                      .includes(
+                        searchText.toUpperCase().trim().replace(/\s/g, "")
+                      )
+                  )
+                : posts
+            }
+            keyExtractor={({ id }) => id}
+            renderItem={({ item }) => <_postItem item={item} />}
+            onRefresh={_onRefresh}
+            refreshing={isLoading}
           />
-        ) : (
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
-            <Searchbar
-              placeholder="Search"
-              value={searchText}
-              onChangeText={setSearchText}
-              style={styles.input}
-            />
-            <FlatList
-              data={
-                searchText
-                  ? posts.filter((post) =>
-                      post.title
-                        .toUpperCase()
-                        .includes(
-                          searchText.toUpperCase().trim().replace(/\s/g, "")
-                        )
-                    )
-                  : posts
-              }
-              keyExtractor={({ id }) => id}
-              renderItem={({ item }) => <_postItem item={item}/> }
-              onRefresh={_onRefresh}
-              refreshing={isLoading}
-            />
-          </View>
-        )}
-      </SafeAreaView>
-    </View>
+        </View>
+      )}
+    </SafeAreaView>
   );
 };
 
@@ -329,7 +358,6 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
   postContainer: {
-    margin: 10,
     padding: 20,
     borderRadius: 10,
     marginBottom: 10,
@@ -352,10 +380,8 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
   },
   input: {
-    width: "80%",
     fontSize: 20,
     color: "#fff",
-
     borderRadius: 30,
   },
   ButtonPost: {

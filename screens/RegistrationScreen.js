@@ -42,9 +42,9 @@ const Registration = ({ navigation }) => {
   const handleSignUp = async () => {
     try {
       if (!email || !password || !conPassword) {
-        alert("Pleass Enter all input :D");
+        Alert.alert("Error", "invalid username or password!");
       } else if (password !== conPassword) {
-        alert("password don't match!!");
+        Alert.alert("Error", "password don't match!");
       } else {
         await signUp(email, password)
           .then((userCredential) => {
@@ -62,7 +62,11 @@ const Registration = ({ navigation }) => {
             ]);
           })
           .catch((error) => {
-            console.log(error.message);
+           Alert.alert(
+             "Error",
+             "This email address has already been registered!"
+           );
+           console.log(error.message)
           });
       }
     } catch (error) {

@@ -3,30 +3,20 @@ import {
   Text,
   Image,
   ActivityIndicator,
-  Alert,
-  Button,
   FlatList,
-  StyleSheet,
   TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState, useLayoutEffect } from "react";
-import {
-  collection,
-  query,
-  where,
-  getDoc,
-  getDocs,
-  doc,
-} from "firebase/firestore";
-import { db } from "../firebase/config";
-import { useAuth } from "../contexts/AuthContext";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase/config";
 
 import { Ionicons } from "@expo/vector-icons";
+import { styles } from "./PostIDstyle";
 
 const Post = ({ navigation, route }) => {
   const [post, setPost] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { currentUser } = useAuth();
+
   // const title = route.params.title;
   const id = route.params.postID;
 
@@ -37,7 +27,7 @@ const Post = ({ navigation, route }) => {
       const posts_data = await getDocs(postCollectionRef);
       setPost(posts_data?.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
 
-      console.log(post);
+      // console.log(post);
     } catch (error) {
       console.log(`post not found. ${error.message}`);
       setPost(null);
@@ -59,7 +49,12 @@ const Post = ({ navigation, route }) => {
           style={{ marginHorizontal: 10 }}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="ios-arrow-back-circle" size={36} color="#fff" />
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color="#fff"
+            style={{ marginLeft: 20 }}
+          />
         </TouchableOpacity>
       ),
     });
@@ -72,7 +67,7 @@ const Post = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       {isLoading ? (
-        <ActivityIndicator size="large" color="#00ff00" />
+        <ActivityIndicator size="large" color="#0782f9" style={{justifyContent: 'center', alignItems:'center', height: '100%'}}/>
       ) : (
         <FlatList
           data={post.filter((post) => post.postID == id)}
@@ -105,39 +100,3 @@ const Post = ({ navigation, route }) => {
 };
 
 export default Post;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#1F1B24",
-  },
-  button: {
-    backgroundColor: "#0782f9",
-    width: "60%",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 40,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-  ImageContainer: {
-    width: "100%",
-    height: 350,
-  },
-  postContainer: {
-    alignItems: "center",
-  },
-  postText: {
-    color: "#fff",
-    fontSize: 18,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    marginBottom: 5,
-  },
-});

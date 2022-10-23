@@ -4,11 +4,15 @@ import {
   View,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
 } from "react-native";
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { db } from "../firebase/config";
+import React, { useState, useEffect, useLayoutEffect } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { db } from "../../firebase/config";
 import { Avatar } from "react-native-paper";
+import { Ionicons } from "@expo/vector-icons";
+
+import { styles } from "./ProfileStyle";
 
 const ProfileScreen = ({ navigation }) => {
   const { logout, currentUser } = useAuth();
@@ -18,6 +22,7 @@ const ProfileScreen = ({ navigation }) => {
   const handleSignOut = () => {
     logout()
       .then(() => {
+        Alert.alert("Sign Out", "Log out successfully!");
         navigation.navigate("Login");
       })
       .catch((error) => alert(error.message));
@@ -47,14 +52,28 @@ const ProfileScreen = ({ navigation }) => {
     }
   };
 
-
   // const nameLength = user?.name.length
   // const name1 = user?.name.toUpperCase()[0];
   const name2 = user?.name.slice(0, 2).toUpperCase();
 
-  console.log(name2)
 
-  // console.log(nameLength,name1, name2);
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          style={styles.ButtonPost}
+          onPress={() => navigation.navigate("Home")}
+        >
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color="#fff"
+            style={{ marginLeft: 20 }}
+          />
+        </TouchableOpacity>
+      ),
+    });
+  });
 
   useEffect(() => {
     getUser();
@@ -68,16 +87,32 @@ const ProfileScreen = ({ navigation }) => {
     <View style={styles.container}>
       {isLoading ? (
         <ActivityIndicator
+          size="large"
+          color="#0782f9"
           style={{ justifyContent: "center", alignItems: "center" }}
         />
       ) : (
         <View style={styles.profileContainer}>
           <View style={{ alignItems: "center" }}>
             <Avatar.Text size={64} label={name2} />
-            <Text>{user?.email}</Text>
+            <Text style={[styles.textColor, styles.textEmail]}>
+              {user?.email}
+            </Text>
           </View>
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#333",
+              padding: 20,
+              borderRadius: 10,
+              borderWidth: 2,
+              borderColor: "#eee",
+            }}
+            onPress={() => navigation.navigate("Thread Owner")}
+          >
+            <Text style={[styles.textColor, styles.buttonText]}>See Posts</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={handleSignOut}>
-            <Text style={styles.buttonText}>Sign out</Text>
+            <Text style={[styles.textColor, styles.buttonText]}>Sign out</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -86,37 +121,3 @@ const ProfileScreen = ({ navigation }) => {
 };
 
 export default ProfileScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-   
-  },
-  profileContainer: {
-    justifyContent: "space-around",
-    alignItems: "center",
-    backgroundColor: '#eee',
-    height: '100%'
-  },
-  button: {
-    backgroundColor: "#0782f9",
-    width: "60%",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 40,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-  postText: {
-    color: "#fff",
-    marginBottom: 5,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-  },
-});

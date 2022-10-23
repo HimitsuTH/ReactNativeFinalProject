@@ -13,15 +13,17 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import React, { useLayoutEffect, useState, useEffect } from "react";
+import React, { useLayoutEffect, useState } from "react";
 
-import { storage, db } from "../firebase/config";
-
-import { uploadBytes } from "firebase/storage";
+import { storage, db } from "../../firebase/config";
 
 import * as ImagePicker from "expo-image-picker";
 
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
+
+import { Ionicons } from "@expo/vector-icons";
+
+import { styles } from "./CreatePostStyle";
 
 const CreactPostScreen = ({ navigation, route }) => {
   const [title, setTitle] = useState("");
@@ -50,6 +52,24 @@ const CreactPostScreen = ({ navigation, route }) => {
   // const textHour = Math.floor((gap % day) / hour);
   // const textMinute = Math.floor((gap % hour) / minute);
   // const textSecond = Math.floor((gap % minute) / second);
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          style={styles.ButtonPost}
+          onPress={() => navigation.navigate("Home")}
+        >
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color="#fff"
+            style={{ marginLeft: 20 }}
+          />
+        </TouchableOpacity>
+      ),title: "Create Post"
+      
+    });
+  });
 
   const postID =
     getDate.getDay() +
@@ -151,15 +171,17 @@ const CreactPostScreen = ({ navigation, route }) => {
             alert(error);
           });
         });
-        
+
         Alert.alert(
-          "Image uploaded!",
-          "Your image has been uploaded to the Firebase Cloud Storage Successfully!"
+          "Post uploaded!",
+          "Your post has been uploaded!"
         );
         navigation.navigate("Home");
       } catch (error) {
-        console.log(`image not found. ${error.message}`);
+        console.log("error", `image not found. ${error.message}`);
       }
+    } else {
+      Alert.alert("Image not found!", "Please select image!");
     }
 
     setTitle("");
@@ -172,27 +194,14 @@ const CreactPostScreen = ({ navigation, route }) => {
   return (
     <ScrollView style={{ flex: 1 }} behavior="padding">
       <View style={styles.container}>
-        <Pressable
-          style={{
-            width: "90%",
-            backgroundColor: "#1F1B24",
-            height: 250,
-            marginVertical: 20,
-            borderRadius: 20,
-            justifyContent: "center",
-            alignItems: "center",
-            borderColor: "#eee",
-            borderWidth: 2,
-          }}
-          onPress={pickImage}
-        >
+        <Pressable style={styles.uploadView} onPress={pickImage}>
           {image ? (
             <Image
               source={{ uri: image }}
               style={{ width: "100%", height: "100%", borderRadius: 20 }}
             />
           ) : (
-            <Text style={{ color: "#fff" }}>{`( Upload Image here )`}</Text>
+            <Text style={styles.textColor}>{`( Upload Image here )`}</Text>
           )}
         </Pressable>
 
@@ -204,28 +213,43 @@ const CreactPostScreen = ({ navigation, route }) => {
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={{ flex: 1 }}>
               <View style={{ flex: 1, alignItems: "center" }} behavior="height">
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter Title"
-                  placeholderTextColor="#fff"
-                  onChangeText={(text) => setTitle(text)}
-                  value={title}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter City / Province"
-                  placeholderTextColor="#fff"
-                  onChangeText={(text) => setProvince(text)}
-                  value={province}
-                />
-                <TextInput
-                  style={[styles.input, styles.inputDetail]}
-                  placeholder="Enter detail"
-                  placeholderTextColor="#fff"
-                  onChangeText={(text) => setDetail(text)}
-                  multiline={true}
-                  value={detail}
-                />
+                <View style={styles.inputBox}>
+                  <Text style={[styles.textColor, styles.lebelText]}>
+                    Title
+                  </Text>
+                  <TextInput
+                    style={[styles.input, styles.textColor]}
+                    placeholder="Enter Title"
+                    placeholderTextColor="#fff"
+                    onChangeText={(text) => setTitle(text)}
+                    value={title}
+                  />
+                </View>
+                <View style={styles.inputBox}>
+                  <Text style={[styles.textColor, styles.lebelText]}>
+                    County / Province
+                  </Text>
+                  <TextInput
+                    style={[styles.input, styles.textColor]}
+                    placeholder="Enter County / Province"
+                    placeholderTextColor="#fff"
+                    onChangeText={(text) => setProvince(text)}
+                    value={province}
+                  />
+                </View>
+                <View style={styles.inputBox}>
+                  <Text style={[styles.textColor, styles.lebelText]}>
+                    Detail
+                  </Text>
+                  <TextInput
+                    style={[styles.input, styles.inputDetail, styles.textColor]}
+                    placeholder="Enter detail"
+                    placeholderTextColor="#fff"
+                    onChangeText={(text) => setDetail(text)}
+                    multiline={true}
+                    value={detail}
+                  />
+                </View>
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -240,13 +264,13 @@ const CreactPostScreen = ({ navigation, route }) => {
               style={[styles.button, styles.buttonOutline]}
               onPress={() => navigation.goBack()}
             >
-              <Text style={{ color: "#fff" }}>Cancel</Text>
+              <Text style={[styles.textColor, styles.buttonText]}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.buttonUpload, styles.button]}
+              style={[styles.buttonSubmit, styles.button]}
               onPress={onSubmitPost}
             >
-              <Text style={{ color: "#fff", fontWeight: "700" }}>Post</Text>
+              <Text style={[styles.textColor, styles.buttonText]}>Post</Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -256,49 +280,3 @@ const CreactPostScreen = ({ navigation, route }) => {
 };
 
 export default CreactPostScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  textTile: {
-    fontSize: 24,
-    marginBottom: 20,
-  },
-  input: {
-    textAlignVertical: "top",
-    backgroundColor: "#1F1B24",
-    width: 350,
-    padding: 15,
-    borderRadius: 10,
-    marginVertical: 20,
-    shadowColor: "#eee",
-    shadowOffset: {
-      width: 1,
-      height: 2,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 2.62,
-    elevation: 4,
-    color: "#fff",
-  },
-  inputDetail: {
-    height: 200,
-  },
-  buttonUpload: {
-    backgroundColor: "#0782f9",
-  },
-  button: {
-    alignItems: "center",
-    borderRadius: 10,
-    marginBottom: 20,
-    paddingVertical: 10,
-    width: 150,
-  },
-  buttonOutline: {
-    borderColor: "#eee",
-    borderWidth: 2,
-  },
-});

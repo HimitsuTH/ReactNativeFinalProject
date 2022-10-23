@@ -1,10 +1,10 @@
 import {
-  StyleSheet,
+  Alert,
   Text,
   View,
   KeyboardAvoidingView,
   TouchableOpacity,
-  ScrollView,
+
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
@@ -24,7 +24,7 @@ const LoginScreen = ({ navigation }) => {
     try {
       await login(email, password, navigation).then(() => {
 
-        alert("Login successed.")
+        Alert.alert("Sign In","Login successed.");
         navigation.navigate("Home");
         setIsError("");
       });

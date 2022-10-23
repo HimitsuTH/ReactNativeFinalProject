@@ -17,9 +17,11 @@ import { useAuth } from "../contexts/AuthContext";
 import LoginScreen from "../screens/LoginScreen";
 import HomeScreen from "../screens/HomeScreen";
 import Registration from "../screens/RegistrationScreen";
-import CreatePostScreen from "../screens/CreatePostScreen";
-import ProfileScreen from "../screens/ProfileScreen";
-import PostScreen from "../screens/PostScreen";
+import CreatePostScreen from "../screens/Create/CreatePostScreen";
+import ProfileScreen from "../screens/Profile/ProfileScreen";
+import PostScreen from "../screens/PostID/PostScreen";
+import EditPostScreen from "../screens/Edit/EditPostScreen";
+import ListPost from "../screens/Profile/Thread Owner/ListPost";
 
 const MyTheme = {
   ...DefaultTheme,
@@ -70,7 +72,7 @@ const MyTab = () => {
           } else if (route.name === "PostCreate") {
             iconName = "add-circle";
           } else if (route.name === "Profile") {
-            iconName = "log-out-outline";
+            iconName = "menu";
           }
 
           // You can return any component that you like here!
@@ -78,6 +80,8 @@ const MyTab = () => {
         },
         tabBarActiveTintColor: "#0782f9",
         tabBarInactiveTintColor: "gray",
+        tabBarShowLabel: false,
+        headerTitleAlign: "center",
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
@@ -108,6 +112,22 @@ const MyTab = () => {
       <Tab.Screen
         name="Post"
         component={PostScreen}
+        options={{
+          tabBarButton: () => null,
+          tabBarVisible: false, //hide tab bar on this screen
+        }}
+      />
+      <Tab.Screen
+        name="Edit"
+        component={EditPostScreen}
+        options={{
+          tabBarButton: () => null,
+          tabBarVisible: false, //hide tab bar on this screen
+        }}
+      />
+      <Tab.Screen
+        name="Thread Owner"
+        component={ListPost}
         options={{
           tabBarButton: () => null,
           tabBarVisible: false, //hide tab bar on this screen

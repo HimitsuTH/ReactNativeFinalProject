@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
-    return auth.signOut().then(() => alert("Sign Out"));
+    return auth.signOut();
   }
 
  
