@@ -21,14 +21,14 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "travelerPro.me",
+      "package": "travelPro.me",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/Travelicon.png",
         "backgroundColor": "#FFFFFF"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/Travelicon.png"
     },
     "plugins": [
       [

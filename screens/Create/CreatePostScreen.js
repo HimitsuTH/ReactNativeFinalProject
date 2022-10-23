@@ -94,7 +94,7 @@ const CreactPostScreen = ({ navigation, route }) => {
         quality: 1,
       });
 
-      console.log(result);
+      // console.log(result);
 
       if (!result.cancelled) {
         setImage(result.uri);
@@ -156,7 +156,7 @@ const CreactPostScreen = ({ navigation, route }) => {
             (snapshot.bytesTransferred / snapshot.totalBytes) * 10000
           );
           setTransferred(progress);
-          console.log(transferred);
+          // console.log(transferred);
         },
         (error) => {
           console.log(error);

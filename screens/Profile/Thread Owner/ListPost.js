@@ -139,13 +139,27 @@ const ListPost = ({ navigation }) => {
   }, []);
   return (
     <View>
-      <FlatList
-        data={posts}
-        keyExtractor={({ id }) => id}
-        renderItem={({ item }) => <_postItem item={item} />}
-        onRefresh={_onRefresh}
-        refreshing={isLoading}
-      />
+      {posts.length > 0 ? (
+        <FlatList
+          data={posts}
+          keyExtractor={({ id }) => id}
+          renderItem={({ item }) => <_postItem item={item} />}
+          onRefresh={_onRefresh}
+          refreshing={isLoading}
+        />
+      ) : (
+        <View style={{justifyContent: 'center', alignItems: 'center', height: '100%'}}>
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: 24,
+              textAlign: "center",
+            }}
+          >
+            No Posts!!!
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
