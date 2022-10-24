@@ -185,7 +185,7 @@ const HomeScreen = ({ navigation }) => {
       });
   };
 
-  const _postItem = useCallback(({ item }) => {
+  const _postItem = (({ item }) => {
     const userLike = item.likes.filter((idc) => idc.idLike === currentUser.uid);
     return (
       <View style={styles.postContainer}>
@@ -327,6 +327,7 @@ const HomeScreen = ({ navigation }) => {
             renderItem={({ item }) => <_postItem item={item} />}
             onRefresh={_onRefresh}
             refreshing={isLoading}
+            removeClippedSubviews={true}
           />
         </View>
       )}
