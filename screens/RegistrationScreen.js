@@ -39,12 +39,21 @@ const Registration = ({ navigation }) => {
 
     console.log(userId);
   };
+
+  const regex = /^\S+@\S+\.\S+$/;
+
+  console.log(regex.test(email));
+
   const handleSignUp = async () => {
     try {
       if (!email || !password || !conPassword) {
-        Alert.alert("Error", "invalid username or password!");
+        Alert.alert("Error", "Invalid username or password!");
       } else if (password !== conPassword) {
-        Alert.alert("Error", "password don't match!");
+        Alert.alert("Error", "Password don't match!");
+      } else if (password.length < 6 || conPassword.length < 6) {
+        Alert.alert("Error", "Password less than 6 characters");
+      } else if (!regex.test(email)) {
+        Alert.alert("Error", "Your email is invalid!");
       } else {
         await signUp(email, password)
           .then((userCredential) => {
@@ -62,11 +71,11 @@ const Registration = ({ navigation }) => {
             ]);
           })
           .catch((error) => {
-           Alert.alert(
-             "Error",
-             "This email address has already been registered!"
-           );
-           console.log(error.message)
+            Alert.alert(
+              "Error",
+              "This email address has already been registered!"
+            );
+            console.log(error.message);
           });
       }
     } catch (error) {

@@ -12,8 +12,9 @@ import {
   Image,
   Pressable,
   Alert,
+  ActivityIndicator,
 } from "react-native";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState, useEffect } from "react";
 
 import { storage, db } from "../../firebase/config";
 
@@ -66,8 +67,8 @@ const CreactPostScreen = ({ navigation, route }) => {
             style={{ marginLeft: 20 }}
           />
         </TouchableOpacity>
-      ),title: "Create Post"
-      
+      ),
+      title: "Create Post",
     });
   });
 
@@ -164,6 +165,7 @@ const CreactPostScreen = ({ navigation, route }) => {
       );
 
       try {
+        setUploading(true);
         await uploadTask;
         await uploadRef.getDownloadURL().then((url) => {
           data.image = url;
@@ -172,10 +174,7 @@ const CreactPostScreen = ({ navigation, route }) => {
           });
         });
 
-        Alert.alert(
-          "Post uploaded!",
-          "Your post has been uploaded!"
-        );
+        Alert.alert("Post uploaded!", "Your post has been uploaded!");
         navigation.navigate("Home");
       } catch (error) {
         console.log("error", `image not found. ${error.message}`);
@@ -187,94 +186,116 @@ const CreactPostScreen = ({ navigation, route }) => {
     setTitle("");
     setProvince("");
     setDetail("");
-    setUploading(false);
+
     setImage(null);
   };
 
+  useEffect(() => {
+    // const interval = setInterval(() => {
+    //   setUploading(false);
+    // }, 3000);
+    // return () => clearInterval(interval);
+  }, [uploading]);
+
   return (
     <ScrollView style={{ flex: 1 }} behavior="padding">
-      <View style={styles.container}>
-        <Pressable style={styles.uploadView} onPress={pickImage}>
-          {image ? (
-            <Image
-              source={{ uri: image }}
-              style={{ width: "100%", height: "100%", borderRadius: 20 }}
-            />
-          ) : (
-            <Text style={styles.textColor}>{`( Upload Image here )`}</Text>
-          )}
-        </Pressable>
+      {uploading ? (
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color="#0782f9" />
+        </View>
+      ) : (
+        <View style={styles.container}>
+          <Pressable style={styles.uploadView} onPress={pickImage}>
+            {image ? (
+              <Image
+                source={{ uri: image }}
+                style={{ width: "100%", height: "100%", borderRadius: 20 }}
+              />
+            ) : (
+              <Text style={styles.textColor}>{`( Upload Image here )`}</Text>
+            )}
+          </Pressable>
 
-        <KeyboardAvoidingView
-          behavior="height"
-          style={{ flex: 1 }}
-          keyboardVerticalOffset={-500}
-        >
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View style={{ flex: 1 }}>
-              <View style={{ flex: 1, alignItems: "center" }} behavior="height">
-                <View style={styles.inputBox}>
-                  <Text style={[styles.textColor, styles.lebelText]}>
-                    Title
-                  </Text>
-                  <TextInput
-                    style={[styles.input, styles.textColor]}
-                    placeholder="Enter Title"
-                    placeholderTextColor="#fff"
-                    onChangeText={(text) => setTitle(text)}
-                    value={title}
-                  />
-                </View>
-                <View style={styles.inputBox}>
-                  <Text style={[styles.textColor, styles.lebelText]}>
-                    County / Province
-                  </Text>
-                  <TextInput
-                    style={[styles.input, styles.textColor]}
-                    placeholder="Enter County / Province"
-                    placeholderTextColor="#fff"
-                    onChangeText={(text) => setProvince(text)}
-                    value={province}
-                  />
-                </View>
-                <View style={styles.inputBox}>
-                  <Text style={[styles.textColor, styles.lebelText]}>
-                    Detail
-                  </Text>
-                  <TextInput
-                    style={[styles.input, styles.inputDetail, styles.textColor]}
-                    placeholder="Enter detail"
-                    placeholderTextColor="#fff"
-                    onChangeText={(text) => setDetail(text)}
-                    multiline={true}
-                    value={detail}
-                  />
+          <KeyboardAvoidingView
+            behavior="height"
+            style={{ flex: 1 }}
+            keyboardVerticalOffset={-500}
+          >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View style={{ flex: 1 }}>
+                <View
+                  style={{ flex: 1, alignItems: "center" }}
+                  behavior="height"
+                >
+                  <View style={styles.inputBox}>
+                    <Text style={[styles.textColor, styles.lebelText]}>
+                      Title
+                    </Text>
+                    <TextInput
+                      style={[styles.input, styles.textColor]}
+                      placeholder="Enter Title"
+                      placeholderTextColor="#fff"
+                      onChangeText={(text) => setTitle(text)}
+                      value={title}
+                    />
+                  </View>
+                  <View style={styles.inputBox}>
+                    <Text style={[styles.textColor, styles.lebelText]}>
+                      County / Province
+                    </Text>
+                    <TextInput
+                      style={[styles.input, styles.textColor]}
+                      placeholder="Enter County / Province"
+                      placeholderTextColor="#fff"
+                      onChangeText={(text) => setProvince(text)}
+                      value={province}
+                    />
+                  </View>
+                  <View style={styles.inputBox}>
+                    <Text style={[styles.textColor, styles.lebelText]}>
+                      Detail
+                    </Text>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        styles.inputDetail,
+                        styles.textColor,
+                      ]}
+                      placeholder="Enter detail"
+                      placeholderTextColor="#fff"
+                      onChangeText={(text) => setDetail(text)}
+                      multiline={true}
+                      value={detail}
+                    />
+                  </View>
                 </View>
               </View>
+            </TouchableWithoutFeedback>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                justifyContent: "space-around",
+              }}
+            >
+              <TouchableOpacity
+                style={[styles.button, styles.buttonOutline]}
+                onPress={() => navigation.goBack()}
+              >
+                <Text style={[styles.textColor, styles.buttonText]}>
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.buttonSubmit, styles.button]}
+                onPress={onSubmitPost}
+              >
+                <Text style={[styles.textColor, styles.buttonText]}>Post</Text>
+              </TouchableOpacity>
             </View>
-          </TouchableWithoutFeedback>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-around",
-            }}
-          >
-            <TouchableOpacity
-              style={[styles.button, styles.buttonOutline]}
-              onPress={() => navigation.goBack()}
-            >
-              <Text style={[styles.textColor, styles.buttonText]}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.buttonSubmit, styles.button]}
-              onPress={onSubmitPost}
-            >
-              <Text style={[styles.textColor, styles.buttonText]}>Post</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </View>
+          </KeyboardAvoidingView>
+        </View>
+      )}
     </ScrollView>
   );
 };

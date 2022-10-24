@@ -21,7 +21,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "travelPro.me",
+      "package": "travelProFinal.me",
       "adaptiveIcon": {
         "foregroundImage": "./assets/Travelicon.png",
         "backgroundColor": "#FFFFFF"

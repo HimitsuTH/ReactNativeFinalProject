@@ -11,7 +11,7 @@ import {
   Button,
   Alert,
 } from "react-native";
-import React, { useEffect, useState, useLayoutEffect } from "react";
+import React, { useEffect, useState, useLayoutEffect , useCallback} from "react";
 
 import { useAuth } from "../contexts/AuthContext";
 import { db, storage } from "../firebase/config";
@@ -22,7 +22,6 @@ import { AntDesign } from "@expo/vector-icons";
 
 import { Avatar } from "react-native-paper";
 import { Searchbar } from "react-native-paper";
-
 
 const HomeScreen = ({ navigation }) => {
   // const [posts, setPosts] = useState([]);
@@ -146,8 +145,6 @@ const HomeScreen = ({ navigation }) => {
     ]);
   };
 
-
-
   // function for Like Post
   const onLikePost = (id, likes) => {
     console.log(`id: ${id} likes: ${likes}`);
@@ -155,15 +152,14 @@ const HomeScreen = ({ navigation }) => {
 
     try {
       if (tempLikes.length > 0) {
-
-        //check User like post return id user 
+        //check User like post return id user
         const idFilter = tempLikes.filter(
           (idc) => idc.idLike === currentUser.uid
         );
-        console.log("ID : ", idFilter);
+        // console.log("ID : ", idFilter);
 
         const index = tempLikes.indexOf(idFilter[0]);
-        console.log("INDEX :", index);
+        // console.log("INDEX :", index);
 
         if (index > -1) {
           tempLikes.splice(index, 1);
@@ -189,7 +185,7 @@ const HomeScreen = ({ navigation }) => {
       });
   };
 
-  const _postItem = React.memo(({ item }) => {
+  const _postItem = useCallback(({ item }) => {
     const userLike = item.likes.filter((idc) => idc.idLike === currentUser.uid);
     return (
       <View style={styles.postContainer}>
