@@ -12,6 +12,7 @@ import {
   Alert,
 } from "react-native";
 import React, { useEffect, useState, useLayoutEffect , useCallback} from "react";
+import { useFocusEffect } from "@react-navigation/native";
 
 import { useAuth } from "../contexts/AuthContext";
 import { db, storage } from "../firebase/config";
@@ -85,13 +86,23 @@ const HomeScreen = ({ navigation }) => {
     getPosts();
   };
 
-  useEffect(() => {
-    getPosts();
-    const interval = setInterval(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   getPosts();
+  //   const interval = setInterval(() => {
+  //     setIsLoading(false);
+  //   }, 1000);
+  //   return () => clearInterval(interval);
+  // }, []);
+
+  useFocusEffect(
+    useCallback(()=> {
+       getPosts();
+       const interval = setInterval(() => {
+         setIsLoading(false);
+       }, 1000);
+       return () => clearInterval(interval);
+    },[])
+  )
 
   useLayoutEffect(() => {
     navigation.setOptions({

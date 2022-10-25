@@ -191,10 +191,10 @@ const CreactPostScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    // const interval = setInterval(() => {
-    //   setUploading(false);
-    // }, 3000);
-    // return () => clearInterval(interval);
+    const interval = setInterval(() => {
+      setUploading(false);
+    }, 3000);
+    return () => clearInterval(interval);
   }, [uploading]);
 
   return (
